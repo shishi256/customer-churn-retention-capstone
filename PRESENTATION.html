@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Capstone Presentation: Customer Churn & Retention Optimization</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --secondary: #0f172a;
+      --accent: #10b981;
+      --danger: #ef4444;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Presentation Header */
+    header {
+      background: var(--secondary);
+      color: white;
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      z-index: 10;
+    }
+
+    header h1 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .badge {
+      background: var(--primary);
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .slide-counter {
+      font-size: 0.9rem;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    /* Main Slide Container */
+    main {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 30px;
+      overflow-y: auto;
+    }
+
+    .slide {
+      display: none;
+      width: 100%;
+      max-width: 1150px;
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.05);
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .slide.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+      font-size: 1.85rem;
+      color: var(--secondary);
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      font-size: 1rem;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    /* Metric Cards */
+    .metric-card {
+      background: #f1f5f9;
+      padding: 20px;
+      border-radius: 12px;
+      border-left: 4px solid var(--primary);
+      text-align: left;
+    }
+
+    .metric-card.green { border-color: var(--accent); }
+    .metric-card.red { border-color: var(--danger); }
+
+    .metric-val {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--secondary);
+    }
+
+    .metric-lbl {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    /* Content Cards */
+    .card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .card h3 {
+      font-size: 1.1rem;
+      color: var(--secondary);
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    li {
+      margin-bottom: 10px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+    }
+
+    li strong {
+      color: var(--secondary);
+    }
+
+    .bullet {
+      color: var(--primary);
+      font-weight: bold;
+    }
+
+    /* Image Display */
+    .img-box {
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+      background: #ffffff;
+      text-align: center;
+    }
+
+    .img-box img {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: contain;
+      max-height: 420px;
+    }
+
+    /* Table */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 0.9rem;
+    }
+
+    th, td {
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    th {
+      background: #f8fafc;
+      color: var(--secondary);
+      font-weight: 600;
+    }
+
+    tr:hover {
+      background: #f1f5f9;
+    }
+
+    .highlight-row {
+      background: #eff6ff;
+      font-weight: 600;
+    }
+
+    /* Controls Bar */
+    footer {
+      background: white;
+      border-top: 1px solid #e2e8f0;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .btn {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 8px 18px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.15s;
+    }
+
+    .btn:hover { background: var(--primary-dark); }
+    .btn:disabled { background: #cbd5e1; cursor: not-allowed; }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid #cbd5e1;
+    }
+    .btn-outline:hover { background: #f1f5f9; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1><span>YuvaIntern Capstone Project</span> <span class="badge">Production Grade</span></h1>
+    <div class="slide-counter">Slide <span id="current-slide">1</span> of <span id="total-slides">8</span></div>
+  </header>
+
+  <main>
+
+    <!-- Slide 1: Title -->
+    <section class="slide active" id="slide-1">
+      <div style="text-align: center; padding: 40px 20px;">
+        <span class="badge" style="padding: 6px 14px; font-size: 0.85rem; margin-bottom: 16px; display: inline-block;">End-to-End Capstone Project</span>
+        <h2 style="font-size: 2.5rem; margin-bottom: 12px;">Customer Churn Prediction & Retention Optimization</h2>
+        <p class="subtitle" style="font-size: 1.2rem; max-width: 800px; margin: 0 auto 36px auto;">
+          A Comprehensive Machine Learning, Statistical Inference, and Financial Decision Intelligence Framework
+        </p>
+
+        <div class="grid-4" style="max-width: 950px; margin: 0 auto 36px auto;">
+          <div class="metric-card">
+            <div class="metric-val">0.932</div>
+            <div class="metric-lbl">Test ROC-AUC</div>
+          </div>
+          <div class="metric-card green">
+            <div class="metric-val">87.0%</div>
+            <div class="metric-lbl">Churn Sensitivity</div>
+          </div>
+          <div class="metric-card green">
+            <div class="metric-val">$606K</div>
+            <div class="metric-lbl">Net Annual Profit</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-val">524%</div>
+            <div class="metric-lbl">Projected ROI</div>
+          </div>
+        </div>
+
+        <p style="color: var(--text-muted); font-size: 0.95rem;">
+          <strong>Demonstrating All 7 Capstone Objectives:</strong> Problem Formulation • Data Hygiene & Feature Engineering • Statistical Hypothesis Testing • Multi-Model ML Benchmarking • Error & Calibration Diagnostics • Customer Personas • ROI Simulation
+        </p>
+      </div>
+    </section>
+
+    <!-- Slide 2: Problem & Objectives -->
+    <section class="slide" id="slide-2">
+      <h2>1. Problem Formulation & Business Economics</h2>
+      <p class="subtitle">Objective 1: Defining the Capstone Problem, Requirements, and Scope</p>
+      <div class="grid-2">
+        <div class="card">
+          <h3>The Enterprise Business Challenge</h3>
+          <ul>
+            <li><span class="bullet">▪</span> <strong>Reactive Retention Failure:</strong> Reaching out only after a customer initiates cancellation yields &lt; 15% save rates.</li>
+            <li><span class="bullet">▪</span> <strong>High Acquisition Costs (CAC):</strong> Acquiring a new customer costs 5–7× more than retaining an existing subscriber.</li>
+            <li><span class="bullet">▪</span> <strong>Revenue at Risk:</strong> In an active cohort of 8,500 subscribers, a 24.9% churn rate burns <strong>$1.52 Million annually</strong>.</li>
+            <li><span class="bullet">▪</span> <strong>Asymmetric Business Costs:</strong> Missing a churner costs $720 in lost LTV, while a false alarm costs only $65 in marketing spend.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>Methodological & Technical Scope</h3>
+          <ul>
+            <li><span class="bullet">▪</span> <strong>Data Hygiene:</strong> Rectify real-world defects (whitespace nulls in zero-tenure charges).</li>
+            <li><span class="bullet">▪</span> <strong>Statistical Inference:</strong> Formal Chi-square, Cramér's V, and Welch's t-tests.</li>
+            <li><span class="bullet">▪</span> <strong>ML Architectures:</strong> Benchmark Logistic Regression, Random Forest, HistGradientBoosting, and Neural Networks.</li>
+            <li><span class="bullet">▪</span> <strong>Decision Intelligence:</strong> Threshold optimization via financial payoff matrix.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 3: Exploratory Data Analysis -->
+    <section class="slide" id="slide-3">
+      <h2>2. Exploratory Data Analysis & Churn Dynamics</h2>
+      <p class="subtitle">Objective 2: Uncovering Core Churn Indicators and Lifecycle Patterns</p>
+      <div class="grid-2">
+        <div class="img-box">
+          <img src="figures/01_churn_distribution_and_tenure.png" alt="Churn and Tenure Distribution">
+        </div>
+        <div>
+          <div class="card" style="margin-bottom: 16px;">
+            <h3>Key Exploratory Insights</h3>
+            <ul>
+              <li><span class="bullet">▪</span> <strong>The Critical 12-Month Cliff:</strong> Median tenure for churned subscribers is only <strong>12.0 months</strong> vs 37.5 months for retained users.</li>
+              <li><span class="bullet">▪</span> <strong>Contract Vulnerability:</strong> Month-to-month contracts suffer a <strong>43.8% churn rate</strong> vs 2.9% on two-year plans.</li>
+              <li><span class="bullet">▪</span> <strong>Payment Method Risk:</strong> Electronic check users churn at <strong>45.2%</strong> vs &lt; 15% for automatic bank/card payments.</li>
+            </ul>
+          </div>
+          <div class="img-box">
+            <img src="figures/02_contract_and_billing_impact.png" alt="Contract and Payment Impact" style="max-height: 190px;">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 4: Statistical Hypothesis Testing -->
+    <section class="slide" id="slide-4">
+      <h2>3. Rigorous Statistical Hypothesis Testing</h2>
+      <p class="subtitle">Objective 3: Validating Driver Significance via Parametric and Non-Parametric Tests</p>
+      <div class="card" style="margin-bottom: 20px;">
+        <h3>Statistical Hypothesis Test Results ($\alpha = 0.001$)</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Feature Tested</th>
+              <th>Test Applied</th>
+              <th>Test Statistic</th>
+              <th>p-value</th>
+              <th>Effect Size</th>
+              <th>Interpretation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="highlight-row">
+              <td><strong>Contract Type</strong></td>
+              <td>Chi-Square ($\chi^2$)</td>
+              <td>2,179.53</td>
+              <td>&lt; 10⁻¹⁰⁰</td>
+              <td>Cramér's V = <strong>0.5062</strong></td>
+              <td>Very Strong Association</td>
+            </tr>
+            <tr>
+              <td><strong>Customer Satisfaction</strong></td>
+              <td>Welch's t-test</td>
+              <td>-58.67</td>
+              <td>&lt; 10⁻¹⁰⁰</td>
+              <td>Cohen's d = <strong>-1.458</strong></td>
+              <td>Very Large Negative Effect</td>
+            </tr>
+            <tr class="highlight-row">
+              <td><strong>Tenure (Months)</strong></td>
+              <td>Welch's t-test</td>
+              <td>-58.55</td>
+              <td>&lt; 10⁻¹⁰⁰</td>
+              <td>Cohen's d = <strong>-1.141</strong></td>
+              <td>Large Negative Effect</td>
+            </tr>
+            <tr>
+              <td><strong>Support Ticket Velocity</strong></td>
+              <td>Welch's t-test</td>
+              <td>+26.83</td>
+              <td>1.97 × 10⁻¹³⁸</td>
+              <td>Cohen's d = <strong>+0.988</strong></td>
+              <td>Large Positive Effect</td>
+            </tr>
+            <tr>
+              <td><strong>Payment Method</strong></td>
+              <td>Chi-Square ($\chi^2$)</td>
+              <td>668.55</td>
+              <td>1.39 × 10⁻¹⁴⁴</td>
+              <td>Cramér's V = <strong>0.2798</strong></td>
+              <td>Moderate Association</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="font-size: 0.95rem; color: var(--text-muted);">
+        All key behavioral and contractual drivers reject the null hypothesis ($H_0$) with $p &lt; 0.001$, proving these patterns are structural, not sampling noise.
+      </p>
+    </section>
+
+    <!-- Slide 5: Machine Learning Benchmarking -->
+    <section class="slide" id="slide-5">
+      <h2>4. Machine Learning Model Benchmarking</h2>
+      <p class="subtitle">Objective 4: Cross-Validation & Out-of-Sample Evaluation Across 4 Architectures</p>
+      <div class="grid-2">
+        <div class="img-box">
+          <img src="figures/06_model_comparison_metrics.png" alt="Model Comparison Metrics">
+        </div>
+        <div>
+          <div class="card" style="margin-bottom: 16px;">
+            <h3>Out-of-Sample Performance (20% Holdout)</h3>
+            <table>
+              <thead>
+                <tr>
+                  <th>Model Architecture</th>
+                  <th>ROC-AUC</th>
+                  <th>PR-AUC</th>
+                  <th>Recall</th>
+                  <th>F2-Score</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="highlight-row">
+                  <td><strong>Logistic Regression (Baseline)</strong></td>
+                  <td><strong>0.9322</strong></td>
+                  <td><strong>0.8149</strong></td>
+                  <td><strong>87.03%</strong></td>
+                  <td><strong>0.8156</strong></td>
+                </tr>
+                <tr>
+                  <td><strong>Neural Network (MLP)</strong></td>
+                  <td>0.9278</td>
+                  <td>0.8047</td>
+                  <td>69.58%</td>
+                  <td>0.7081</td>
+                </tr>
+                <tr>
+                  <td><strong>HistGradientBoosting</strong></td>
+                  <td>0.9191</td>
+                  <td>0.7789</td>
+                  <td>79.72%</td>
+                  <td>0.7699</td>
+                </tr>
+                <tr>
+                  <td><strong>Random Forest (200 Trees)</strong></td>
+                  <td>0.9180</td>
+                  <td>0.7820</td>
+                  <td>79.25%</td>
+                  <td>0.7678</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="img-box">
+            <img src="figures/07_roc_and_pr_curves.png" alt="ROC and PR Curves" style="max-height: 200px;">
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 6: Financial Optimization & Diagnostics -->
+    <section class="slide" id="slide-6">
+      <h2>5. Decision Threshold & Financial Optimization</h2>
+      <p class="subtitle">Objective 5: Diagnostic Error Analysis & Maximizing Campaign Profitability</p>
+      <div class="grid-2">
+        <div class="img-box">
+          <img src="figures/09_expected_profit_vs_threshold.png" alt="Expected Profit vs Threshold">
+        </div>
+        <div class="card">
+          <h3>Financial Payoff Optimization</h3>
+          <ul>
+            <li><span class="bullet">▪</span> <strong>The 0.50 Threshold Flaw:</strong> Default 0.50 cutoffs treat false alarms and missed churners identically, missing 20% of at-risk revenue.</li>
+            <li><span class="bullet">▪</span> <strong>The Optimal Cutoff:</strong> Sweeping the cost-benefit curve reveals the profit-maximizing threshold at <strong>$p = 0.13$</strong>.</li>
+            <li><span class="bullet">▪</span> <strong>Economic Lift:</strong> Increases campaign net profit from $89,245 to <strong>$95,385 (+6.9%)</strong> on test data.</li>
+            <li><span class="bullet">▪</span> <strong>Churn Recall Boost:</strong> Catches <strong>94.8% of all true churners</strong> (only 22 missed accounts).</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Slide 7: Explainability & Personas -->
+    <section class="slide" id="slide-7">
+      <h2>6. Explainability & Strategic Customer Personas</h2>
+      <p class="subtitle">Objective 6: Unsupervised Persona Clustering and Tailored Interventions</p>
+      <div class="grid-3">
+        <div class="card" style="border-top: 4px solid var(--danger);">
+          <h3>Persona A: Frustrated Onboarders</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">High Ticket Velocity (3.7 tickets) • High Charges ($93.7)</p>
+          <ul>
+            <li><span class="bullet">▪</span> <strong>Root Cause:</strong> Complex fiber setup friction with unmet high expectations.</li>
+            <li><span class="bullet">▪</span> <strong>Intervention:</strong> Dedicated Tier-3 technical concierge check-in + billing credit.</li>
+          </ul>
+        </div>
+
+        <div class="card" style="border-top: 4px solid var(--primary);">
+          <h3>Persona B: Price-Sensitive Streamers</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Single Line ($35/mo) • Zero Addon Services</p>
+          <ul>
+            <li><span class="bullet">▪</span> <strong>Root Cause:</strong> No switching barrier; vulnerable to streaming competitor promos.</li>
+            <li><span class="bullet">▪</span> <strong>Intervention:</strong> Bundle discount: free 6 months Security & Backup.</li>
+          </ul>
+        </div>
+
+        <div class="card" style="border-top: 4px solid var(--accent);">
+          <h3>Persona C: Month-to-Month High Friction</h3>
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px;">Electronic Check • Short Tenure (6.9 mo) • Low Satisfaction</p>
+          <ul>
+            <li><span class="bullet">▪</span> <strong>Root Cause:</strong> Manual billing friction + month-to-month flexibility.</li>
+            <li><span class="bullet">▪</span> <strong>Intervention:</strong> 15% discount for 1-year annual contract + Autopay.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="img-box" style="margin-top: 20px;">
+        <img src="figures/11_feature_importance.png" alt="Top 15 Feature Importances" style="max-height: 220px;">
+      </div>
+    </section>
+
+    <!-- Slide 8: Business ROI & Conclusion -->
+    <section class="slide" id="slide-8">
+      <h2>7. Business ROI & Executive Takeaways</h2>
+      <p class="subtitle">Objective 7: Translating Data Science into Quantified Enterprise Value</p>
+      <div class="grid-2">
+        <div class="card">
+          <h3>Annualized Enterprise ROI Model (8,500 Base)</h3>
+          <ul>
+            <li><span class="bullet">▪</span> <strong>Annual Churn Pool:</strong> 2,116 customers lost ($1,523,520 at risk).</li>
+            <li><span class="bullet">▪</span> <strong>Model Targeted Group:</strong> ~1,780 at-risk subscribers.</li>
+            <li><span class="bullet">▪</span> <strong>Preserved Accounts (50% save rate):</strong> <strong>1,003 subscribers saved</strong>.</li>
+            <li><span class="bullet">▪</span> <strong>Gross Preserved Revenue:</strong> <strong>$722,160 / year</strong>.</li>
+            <li><span class="bullet">▪</span> <strong>Campaign Execution Costs:</strong> $115,700 ($65/targeted user).</li>
+            <li><span class="bullet">▪</span> <strong>Net Annual Bottom-Line Profit:</strong> <strong style="color: var(--accent); font-size: 1.2rem;">$606,460</strong>.</li>
+            <li><span class="bullet">▪</span> <strong>Net Marketing ROI:</strong> <strong style="color: var(--accent); font-size: 1.2rem;">524%</strong>.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>Capstone Deliverables Summary</h3>
+          <ul>
+            <li><span class="bullet">✔</span> <strong>Production Codebase:</strong> Modularized Python library in <code>src/</code>.</li>
+            <li><span class="bullet">✔</span> <strong>Interactive Notebook:</strong> <code>notebooks/capstone_churn_prediction.ipynb</code>.</li>
+            <li><span class="bullet">✔</span> <strong>Comprehensive Report:</strong> <code>REPORT.md</code> (Executive & Technical).</li>
+            <li><span class="bullet">✔</span> <strong>Publication Figures:</strong> 12 high-resolution charts in <code>figures/</code>.</li>
+            <li><span class="bullet">✔</span> <strong>Real-time Inference CLI:</strong> <code>predict.py</code> customer risk engine.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <button class="btn btn-outline" id="prev-btn" onclick="prevSlide()" disabled>← Previous</button>
+    <div style="font-size: 0.85rem; color: var(--text-muted);">Use Left / Right arrow keys to navigate</div>
+    <button class="btn" id="next-btn" onclick="nextSlide()">Next Slide →</button>
+  </footer>
+
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 8;
+
+    function showSlide(n) {
+      document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+      const activeSlide = document.getElementById(`slide-${n}`);
+      if (activeSlide) activeSlide.classList.add('active');
+      
+      document.getElementById('current-slide').innerText = n;
+      document.getElementById('prev-btn').disabled = (n === 1);
+      document.getElementById('next-btn').disabled = (n === totalSlides);
+      currentSlide = n;
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) showSlide(currentSlide + 1);
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) showSlide(currentSlide - 1);
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'Space') nextSlide();
+      if (e.key === 'ArrowLeft') prevSlide();
+    });
+  </script>
+
+</body>
+</html>
+
